@@ -1,0 +1,37 @@
+class Twitter:
+
+    def __init__(self):
+        self.friends = {}
+        self.tweets = {}
+        self.timer = 0
+
+    def postTweet(self, userId: int, tweetId: int) -> None:
+        user_tweets = self.tweets.get(userId, [])
+        user_tweets.append((self.timer, tweetId)) 
+        self.tweets[userId] = user_tweets
+        self.timer += 1
+
+    def getNewsFeed(self, userId: int) -> List[int]:
+        user_ids = [userId] + list(self.friends.get(userId, set()))
+        all_tweets = []
+        for user_id in user_ids:
+            user_tweets = self.tweets.get(user_id, [])
+            all_tweets.extend(user_tweets[-10:])
+        all_tweets.sort(key=lambda x: x[0], reverse=True)
+        return [t[1] for t in all_tweets[:10]]
+
+
+    def follow(self, followerId: int, followeeId: int) -> None:
+        if followerId == followeeId:
+            return
+        friends = self.friends.get(followerId, set())
+        friends.add(followeeId)
+        self.friends[followerId] = friends
+
+    def unfollow(self, followerId: int, followeeId: int) -> None:
+        if followerId == followeeId:
+            return
+        friends = self.friends.get(followerId, None)
+        if friends:
+            friends.discard(followeeId)
+            self.friends[followerId] = friends
